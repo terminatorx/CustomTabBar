@@ -161,22 +161,21 @@ class _TabStyle extends AnimatedWidget {
 
     // To enable TextStyle.lerp(style1, style2, value), both styles must have
     // the same value of inherit. Force that to be inherit=true here.
-    
-    // final TextStyle defaultStyle = (labelStyle ??
-    //         tabBarTheme.labelStyle ??
-    //         themeData.primaryTextTheme.bodyText1)
-    //     .copyWith(inherit: true);
-    // final TextStyle defaultUnselectedStyle = (unselectedLabelStyle ??
-    //         tabBarTheme.unselectedLabelStyle ??
-    //         labelStyle ??
-    //         themeData.primaryTextTheme.bodyText1)
-    //     .copyWith(inherit: true);
-    // final TextStyle textStyle = selected
-    //     ? TextStyle.lerp(defaultStyle, defaultUnselectedStyle, animation.value)
-    //     : TextStyle.lerp(defaultUnselectedStyle, defaultStyle, animation.value);
 
-    final double multiple =
-        labelStyle.fontSize / unselectedLabelStyle.fontSize;
+    final TextStyle defaultUnselectedStyle = (unselectedLabelStyle ??
+            tabBarTheme.unselectedLabelStyle ??
+            labelStyle ??
+            themeData.primaryTextTheme.bodyText1)
+        .copyWith(inherit: true);
+    final TextStyle defaultStyle = (labelStyle ??
+            tabBarTheme.labelStyle ??
+            themeData.primaryTextTheme.bodyText1)
+        .copyWith(inherit: true).copyWith(fontSize:defaultUnselectedStyle.fontSize);
+    final TextStyle textStyle = selected
+        ? TextStyle.lerp(defaultStyle, defaultUnselectedStyle, animation.value)
+        : TextStyle.lerp(defaultUnselectedStyle, defaultStyle, animation.value);
+
+    final double multiple = labelStyle.fontSize / unselectedLabelStyle.fontSize;
     final double _scale = selected
         ? lerpDouble(multiple, 1, animation.value)
         : lerpDouble(1, multiple, animation.value);
@@ -192,7 +191,7 @@ class _TabStyle extends AnimatedWidget {
         : Color.lerp(unselectedColor, selectedColor, animation.value);
 
     return DefaultTextStyle(
-      style: unselectedLabelStyle.copyWith(color: color),
+      style: textStyle.copyWith(color: color),
       // child: child,
       child: IconTheme.merge(
         data: IconThemeData(
